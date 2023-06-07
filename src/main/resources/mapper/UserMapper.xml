@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace表示命名空间,对应映射文件路径-->
+<mapper namespace="com.ling.project_backend.mapper.UserMapper">
+
+    <resultMap id="userResultMap" type="com.ling.project_backend.domain.User">
+        <id property="userId" column="user_id" jdbcType="INTEGER" />
+        <result property="userName" column="user_name" jdbcType="VARCHAR" />
+        <result property="userEmail" column="user_email" jdbcType="VARCHAR" />
+        <result property="password" column="password" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <sql id="usersColumn">
+        user_id,user_name,user_email,password
+    </sql>
+
+    <select id="findUserByEmailAndPassword" parameterType="user" resultMap="userResultMap">
+        SELECT
+        <include refid="usersColumn" />
+        FROM users WHERE user_email=#{userEmail} AND password=#{password}
+    </select>
+
+    <select id="findUserByEmail" parameterType="user" resultMap="userResultMap">
+        SELECT
+        <include refid="usersColumn" />
+        FROM users WHERE user_email=#{userEmail}
+    </select>
+
+    <!--动态模糊查询用户-->
+    <select id="findUser" parameterType="user" resultMap="userResultMap">
+        SELECT
+        <include refid="usersColumn"></include>
+        FROM users
+        <where>
+            <if test="userName!=null">
+                user_name=#{userName}
+            </if>
+            <if test="userEmail!=null">
+                AND user_email=#{userEmail}
+            </if>
+        </where>
+    </select>
+
+    <insert id="addUser" parameterType="user">
+        INSERT INTO users(user_name,user_email,password) VALUES (#{userName},#{userEmail},#{password})
+    </insert>
+
+
+
+</mapper>

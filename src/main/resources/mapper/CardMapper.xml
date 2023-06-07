@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace表示命名空间,对应映射文件路径-->
+<mapper namespace="com.ling.project_backend.mapper.CardMapper">
+
+    <resultMap id="cardMap" type="com.ling.project_backend.domain.Card">
+        <id property="cardId" column="card_id" jdbcType="INTEGER" />
+        <result property="userId" column="user_id" jdbcType="INTEGER" />
+        <result property="cardHead" column="card_head" jdbcType="VARCHAR" />
+        <result property="cardTime" column="card_time" jdbcType="TIMESTAMP" />
+        <result property="cardImage" column="card_image" jdbcType="VARCHAR" />
+        <result property="cardText" column="card_text" jdbcType="LONGVARCHAR" />
+        <result property="cardLike" column="card_like" jdbcType="INTEGER" />
+    </resultMap>
+
+    <sql id="cardColumn">
+        card_id,user_id,card_head,card_time,card_image,card_text,card_like
+    </sql>
+
+    <!--新建卡片-->
+    <insert id="insertCard" parameterType="card">
+        INSERT INTO cards
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId!=null">user_id,</if>
+            <if test="cardHead!=null">card_head,</if>
+            <if test="cardTime!=null">card_time,</if>
+            <if test="cardImage!=null">card_image,</if>
+            <if test="cardText!=null">card_text,</if>
+        </trim>
+        <trim prefix="values(" suffix=")" suffixOverrides=",">
+            <if test="userId!=null">#{userId},</if>
+            <if test="cardHead!=null">#{cardHead},</if>
+            <if test="cardTime!=null">#{cardTime},</if>
+            <if test="cardImage!=null">#{cardImage},</if>
+            <if test="cardText!=null">#{cardText},</if>
+        </trim>
+    </insert>
+
+    <!--删除卡片-->
+    <delete id="deleteCard" parameterType="card">
+        DELETE FROM cards WHERE card_id=#{cardId}
+    </delete>
+
+    <!--动态更新卡片内容-->
+    <update id="updateCard" parameterType="card">
+        UPDATE cards
+        <set>
+            <if test="cardHead!=null">card_head=#{cardHead},</if>
+            <if test="cardTime!=null">card_time=#{cardTime},</if>
+            <if test="cardImage!=null">card_image=#{cardImage},</if>
+            <if test="cardText!=null">card_text=#{cardText},</if>
+        </set>
+        WHERE card_id=#{cardId}
+    </update>
+
+    <!--模糊查找-->
+    <select id="selectCard" parameterType="card" resultMap="cardMap">
+        SELECT
+        <include refid="cardColumn"></include>
+        FROM cards
+        <where>
+            <if test="cardHead!=null">card_head REGEXP #{cardHead}</if>
+            <if test="cardTime!=null">AND card_time=#{cardTime}</if>
+            <if test="cardText!=null">AND card_text REGEXP #{cardText}</if>
+        </where>
+    </select>
+
+    <!--根据id查找-->
+    <select id="getCard" parameterType="INTEGER" resultMap="cardMap">
+        SELECT
+        <include refid="cardColumn"></include>
+        FROM cards WHERE card_id=#{cardId}
+    </select>
+
+    <!--获取表中卡片数目-->
+    <select id="getCardCount" resultType="INTEGER">
+        SELECT
+        COUNT(*)
+        FROM cards
+    </select>
+
+    <!--获取指定数目卡片-->
+    <select id="getCards" parameterType="INTEGER" resultMap="cardMap">
+        SELECT
+        <include refid="cardColumn"></include>
+        FROM cards LIMIT #{length}
+    </select>
+
+</mapper>

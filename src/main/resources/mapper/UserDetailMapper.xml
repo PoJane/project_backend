@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace表示命名空间,对应映射文件路径-->
+<mapper namespace="com.ling.project_backend.mapper.UserDetailMapper">
+
+    <resultMap id="detailResultMap" type="com.ling.project_backend.domain.UserDetail">
+        <id property="userId" column="user_id" jdbcType="INTEGER" />
+        <result property="userName" column="user_name" jdbcType="VARCHAR" />
+        <result property="userSex" column="user_sex" jdbcType="VARCHAR" />
+        <result property="userBirth" column="user_birth" jdbcType="TIMESTAMP" />
+        <result property="userIntro" column="user_intro" jdbcType="VARCHAR" />
+        <result property="userImage" column="user_image" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <sql id="detailColumn">
+        user_id,user_name,user_sex,user_birth,user_intro,user_image
+    </sql>
+
+    <select id="findUserDetailById" parameterType="INTEGER" resultMap="detailResultMap">
+        SELECT
+        <include refid="detailColumn"></include>
+        FROM users_detail
+        WHERE user_id=#{userId}
+    </select>
+
+    <!--动态查询用户-->
+    <select id="findUserDetail" parameterType="userDetail" resultMap="detailResultMap">
+        SELECT
+        <include refid="detailColumn"></include>
+        FROM users_detail
+        <where>
+            <if test="userId!=null">
+                user_id=#{userId}
+            </if>
+            <if test="userName!=null and userName!=''">
+                AND user_name=#{userName}
+            </if>
+            <if test="userSex!=null and userName!=''">
+                AND user_sex=#{userSex}
+            </if>
+        </where>
+    </select>
+
+    <!--动态选择性插入记录-->
+    <insert id="insertUserDetail" parameterType="userDetail">
+        INSERT INTO users_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId!=null">user_id,</if>
+            <if test="userName!=null">user_name,</if>
+            <if test="userSex!=null">user_sex,</if>
+            <if test="userBirth!=null">user_birth,</if>
+            <if test="userIntro!=null">user_intro,</if>
+            <if test="userImage!=null">user_image,</if>
+        </trim>
+        <trim prefix="values(" suffix=")" suffixOverrides=",">
+            <if test="userId!=null">#{userId},</if>
+            <if test="userName!=null">#{userName},</if>
+            <if test="userSex!=null">#{userSex},</if>
+            <if test="userBirth!=null">#{userBirth},</if>
+            <if test="userIntro!=null">#{userIntro},</if>
+            <if test="userImage!=null">#{userImage},</if>
+        </trim>
+    </insert>
+
+    <update id="updateUserDetail" parameterType="userDetail">
+        UPDATE users_detail
+        <set>
+            <if test="userName!=null and userName!=''">user_name=#{userName},</if>
+            <if test="userSex!=null">user_sex=#{userSex},</if>
+            <if test="userBirth!=null">user_birth=#{userBirth},</if>
+            <if test="userIntro!=null and userIntro!=''">user_intro=#{userIntro},</if>
+            <if test="userImage!=null and userImage!=''">user_image=#{userImage},</if>
+        </set>
+        WHERE user_id=#{userId}
+    </update>
+
+</mapper>

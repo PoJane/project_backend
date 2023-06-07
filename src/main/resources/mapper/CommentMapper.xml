@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace表示命名空间,对应映射文件路径-->
+<mapper namespace="com.ling.project_backend.mapper.CommentMapper">
+
+    <resultMap id="commentMap" type="com.ling.project_backend.domain.Comment">
+        <id property="commentId" column="comment_id" jdbcType="BIGINT" />
+        <result property="userId" column="user_id" jdbcType="INTEGER" />
+        <result property="commentTime" column="comment_time" jdbcType="TIMESTAMP" />
+        <result property="commentLike" column="comment_like" jdbcType="INTEGER" />
+        <result property="cardId" column="card_id" jdbcType="INTEGER" />
+        <result property="commentText" column="comment_text" jdbcType="LONGVARCHAR" />
+    </resultMap>
+
+    <sql id="commentColumn">
+        comment_id,user_id,comment_time,comment_like,card_id,comment_text
+    </sql>
+
+    <insert id="insertComment" parameterType="comment">
+        INSERT INTO comments
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId!=null">user_id,</if>
+            <if test="commentTime!=null">comment_time,</if>
+            <if test="commentLike!=null">comment_like,</if>
+            <if test="cardId!=null">card_id,</if>
+            <if test="commentText!=null">comment_text,</if>
+        </trim>
+        <trim prefix="values(" suffix=")" suffixOverrides=",">
+            <if test="userId!=null">#{userId},</if>
+            <if test="commentTime!=null">#{commentTime},</if>
+            <if test="commentLike!=null">#{commentLike},</if>
+            <if test="cardId!=null">#{cardId},</if>
+            <if test="commentText!=null">#{commentText},</if>
+        </trim>
+    </insert>
+
+    <select id="findComment" parameterType="comment" resultMap="commentMap">
+        SELECT
+        <include refid="commentColumn"></include>
+        FROM comments
+        <where>
+            <if test="userId!=null">
+                user_id=#{userId}
+            </if>
+            <if test="cardId!=null">
+                AND card_id=#{cardId}
+            </if>
+            <if test="commentText!=null">
+                AND comment_text REGEXP #{commentText}
+            </if>
+        </where>
+    </select>
+
+    <select id="findCommentByCardId" parameterType="INTEGER" resultMap="commentMap">
+        SELECT
+        <include refid="commentColumn"></include>
+        FROM comments
+        WHERE card_id=#{cardId}
+    </select>
+
+    <!--获取表中某卡片的所有评论-->
+    <select id="getCommentCountById" parameterType="Integer" resultType="INTEGER">
+        SELECT COUNT(*) FROM comments
+        WHERE card_id=#{cardId}
+    </select>
+
+    <!--获取指定数目评论-->
+    <select id="getComments" parameterType="INTEGER" resultMap="commentMap">
+        SELECT
+        <include refid="commentColumn"></include>
+        FROM comments LIMIT #{count}
+    </select>
+
+</mapper>
