@@ -1,10 +1,13 @@
 package com.ling.project_backend.domain;
 
+import lombok.Data;
+
 import java.sql.Date;
 
 /**
  * 社区详情
  */
+@Data
 public class CommunityDetail {
 
     private Integer communityId;

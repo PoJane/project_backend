@@ -26,6 +26,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
         List<String> excludePath=new ArrayList<>();
         //不需要拦截的url：/login和/home和/
         excludePath.add("/login");
+        excludePath.add("/register");
         excludePath.add("/home");
         excludePath.add("/images");
         excludePath.add("/images/**");
